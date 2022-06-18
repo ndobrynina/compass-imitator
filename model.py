@@ -34,6 +34,7 @@ class DesignModel:
         self._tcp_port = '9000'
         self._mvar = ''
         self._mdev = ''
+        self._bytesize = 8
 
     @property
     def port(self):
@@ -111,6 +112,10 @@ class DesignModel:
     def type_tr(self):
         return self._type_tr
 
+    @property
+    def bytesize(self):
+        return self._bytesize
+
     @port.setter
     def port(self, value):
         self._port = value
@@ -118,6 +123,10 @@ class DesignModel:
     @baudrate.setter
     def baudrate(self, value):
         self._baudrate = value
+
+    @bytesize.setter
+    def bytesize(self, value):
+        self._bytesize = value
 
     @hdt_course.setter
     def hdt_course(self, value):
@@ -261,7 +270,7 @@ class DesignModel:
                                                   self._baudrate)  # создание экземпляра класса SerialTransmitter
             print('switch')
         else:
-            self._transmitter = TCP()
+            self._transmitter = TCP(self)
             print('ready')
         self._started = True  # флаг для запуска потока
         work_thread = threading.Thread(target=self.work)  # создание потока
@@ -275,7 +284,6 @@ class DesignModel:
                 s = self.get_data()
                 print(s)
                 self._transmitter.connect()
-                self._transmitter.data = s
                 self._transmitter.handle()
         else:
             while self._started:
@@ -288,13 +296,6 @@ class DesignModel:
         self._started = False
         self._transmitter.sclose()
 
-
-# class Transmitter:
-#
-#     def transmit(self, sent):
-#         pass
-
-
 class SerialTransmitter:
 
     def __init__(self, port, baud):
@@ -306,33 +307,6 @@ class SerialTransmitter:
     def transmit(self, sent):
         for s in sent:
             self._serial_port.write(s)
-
-
-# class TCPTransmitter(Transmitter):
-#
-#     def __init__(self):
-#         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#         self._tcp_wait = False
-#         self._tcp_start = False
-#
-#     def connect(self):
-#         self._sock.bind(('192.168.1.145', 19997))
-#         self._sock.listen(1)
-#         self._tcp_wait = True
-#
-#     def transmit(self, sent):
-#         conn, addr = self._sock.accept()
-#         try:
-#             for s in sent:
-#                 print(s)
-#                 conn.sendall(s)
-#         except Exception as e:
-#             conn.close()
-#
-#     def sclose(self):
-#         print('closing')
-#         self._sock.close()
-
 
 class MyHandler(socketserver.BaseRequestHandler):
 
@@ -352,10 +326,10 @@ class MyHandler(socketserver.BaseRequestHandler):
 class TCP(socketserver.TCPServer):
     allow_reuse_address = True
 
-    def __init__(self, **kwargs):
+    def __init__(self, dm):
         self._host = '192.168.208.77'
         self._port = 34458
-        self._obj = DesignModel()
+        self._obj = dm
         self._data = None
         self._tcp_start = False
         super().__init__((self._host, self._port), MyHandler)  # вызываю метод инициализации из родительского класса

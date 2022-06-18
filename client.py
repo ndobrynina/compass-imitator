@@ -2,13 +2,24 @@ import socket
 import sys
 
 HOST, PORT = '192.168.208.77', 34458
-connected = False
+connected = True
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    # Connect to server and send data
-    sock.connect((HOST, PORT))
-    # Receive data from the server and shut down
-    received = str(sock.recv(1024), "utf-8")
+def recvall(sock):
+    BUFF_SIZE = 4096
+    data = bytearray()
+    while True:
+        packet = sock.recv(BUFF_SIZE)
+        if not packet:  # Important!!
+            break
+        data.extend(packet)
+    return data
 
-
-print("Received: {}".format(received))
+while connected:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect((HOST, PORT))
+        try:
+            d = recvall(sock)
+            print(f'{d}')
+        except KeyboardInterrupt:
+            print('smth wrong')
+            sock.close()
