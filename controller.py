@@ -49,17 +49,11 @@ class DesignController:
     def set_port_baudrate(self, value):
         self.model.baudrate = value
 
-    def set_interface_mode(self, value):
-        self.model.interface_mode = value
+    def set_tcp_port(self, value):
+        self.model.tcp_port = value
 
-    def set_bytesize(self, value):
-        self.model.bytesize = value
-
-    def set_parity(self, value):
-        self.model.parity = value
-
-    def set_stopbits(self, value):
-        self.model.stopbits = value
+    def set_frequency(self, value):
+        self.model.frequency = value
 
     def set_hdt_sum(self, value):
         self.model.hdt_sum = value

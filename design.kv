@@ -32,11 +32,11 @@
             Label:
                 text: 'Курс'
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.35, .95)}
+                pos_hint: {'center': (.25, .95)}
             Label:
                 text: 'Индикатор режима'
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.55, .95)}     
+                pos_hint: {'center': (.5, .95)}
             Label:
                 color: 1, 1, 1, .6
                 text: 'Контрольная сумма'
@@ -50,17 +50,23 @@
                 selected_color: 1, .4, .2, 1  
                 unselected_color: 1, 1, 1, .6
             MDSlider:
-                pos_hint:{'center': (.35, .85)}
+                id: ths_course
+                pos_hint:{'center': (.25, .85)}
                 min: 0.0
                 max: 359.0
+                hint: False
                 value: 0.0
                 color: 1, .4, .2, 1
                 size_hint: None, None
                 on_active: root.set_ths_course(self.active, self.value)
+            Label:
+                text: str(int(ths_course.value)) + "°"
+                pos_hint:{'center': (.35, .85)}
+                color: 1, 1, 1, .6
             MDTextField:
                 id: indicator_field
                 size: 100, 44
-                pos_hint: {'center': (.55, .85)}
+                pos_hint: {'center': (.5, .85)}
                 text: 'A'
                 current_hint_text_color: 1, 1, 1, .6
                 hint_text_color_focus: 1, 1, 1, .6
@@ -80,10 +86,10 @@
             Label:
                 text: 'Курс'
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.35, .65)}  
+                pos_hint: {'center': (.25, .65)}
             Label:
                 text: 'Тип'
-                pos_hint: {'center': (.55, .65)}  
+                pos_hint: {'center': (.5, .65)}
                 color: 1, 1, 1, .6
             Label:
                 color: 1, 1, 1, .6
@@ -100,16 +106,21 @@
                 unselected_color: 1, 1, 1, .6
             MDSlider:
                 id: hdt_curs
-                pos_hint: {'center': (.35, .55)}
+                pos_hint: {'center': (.25, .55)}
+                hint: False
                 min: 0.0
                 max: 359.0
                 value: 0.0
                 color: 1, .4, .2, 1
                 size_hint: None, None
                 on_active: root.set_hdt_course(self.active, self.value)
+            Label:
+                text: str(int(hdt_curs.value)) + "°"
+                pos_hint:{'center': (.35, .55)}
+                color: 1, 1, 1, .6
             MDTextField:
                 id: hdt_type
-                pos_hint:{'center': (.55, .55)}
+                pos_hint:{'center': (.5, .55)}
                 line_color_focus: 1, .4, .2, 1
                 hint_text: 'Признак истинного курса'
                 text: 'T'
@@ -131,10 +142,10 @@
             Label:
                 text: 'Курс'
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.35, .25)}     
+                pos_hint: {'center': (.25, .25)}
             Label:
                 text: 'Магнитная девиация'
-                pos_hint: {'center': (.55, .35)}
+                pos_hint: {'center': (.5, .35)}
                 color: 1, 1, 1, .6
             Label:
                 color: 1, 1, 1, .6
@@ -149,21 +160,33 @@
                 selected_color: 1, .4, .2, 1  
                 unselected_color: 1, 1, 1, .6
             MDSlider:
-                pos_hint:{'center': (.35, .15)}
+                id: hdg_course
+                pos_hint:{'center': (.25, .15)}
                 min: 0.0
                 max: 359.0
                 value: 0.0
+                hint: False
                 color: 1, .4, .2, 1
                 size_hint: None, None
                 on_active: root.set_hdg_course(self.active, self.value)
+            Label:
+                text: str(int(hdg_course.value)) + "°"
+                pos_hint:{'center': (.35, .15)}
+                color: 1, 1, 1, .6
             MDSlider:
-                pos_hint:{'center': (.55, .25)}
+                id: mag_dev
+                pos_hint:{'center': (.5, .25)}
                 min: -359.9
                 max: 359.9
                 value: 0.0
+                hint: False
                 color: 1, .4, .2, 1
                 size_hint: None, None
                 on_active: root.set_hdg_edev(self.active, self.value)
+            Label:
+                text: str(int(mag_dev.value)) + "°"
+                pos_hint:{'center': (.6, .25)}
+                color: 1, 1, 1, .6
             MDSwitch:
                 pos_hint:{'center': (.75, .15)}
                 theme_thumb_down_color: 'Custom' 
@@ -172,16 +195,22 @@
                 on_active: root.set_hdg_sum(*args)
             Label:
                 text: 'Магнитное склонение'
-                pos_hint: {'center': (.55, .15)}
+                pos_hint: {'center': (.5, .15)}
                 color: 1, 1, 1, .6
             MDSlider:
-                pos_hint:{'center': (.55, .05)}
+                id: mag_decl
+                hint: False
+                pos_hint:{'center': (.5, .05)}
                 min: -359.9
                 max: 359.9
                 value: 0.0
                 color: 1, .4, .2, 1
                 size_hint: None, None
                 on_active: root.set_hdg_wdev(self.active, self.value)
+            Label:
+                text: str(int(mag_decl.value)) + "°"
+                pos_hint:{'center': (.6, .05)}
+                color: 1, 1, 1, .6
 
     TabbedPanelItem:
         text: 'Настройки порта'
@@ -194,130 +223,95 @@
                 text: 'Serial'
                 bold: True
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.3, .95)}
+                pos_hint: {'center': (.25, .95)}
             Label:
                 text: 'Порт'
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.2, .8)} 
-            Label:
-                text: 'Режим'
-                color: 1, 1, 1, .6
-                pos_hint: {'center': (.5, .8)}
+                pos_hint: {'center': (.25, .85)}
             Label:
                 text: 'Скорость'
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.8, .8)}
+                pos_hint: {'center': (.23, .75)}
             MDTextField:
                 id: port_name
                 line_color_focus: 1, .4, .2, 1
-                hint_text: 'Port name'
                 text: '/dev/ttyUSB0'
                 current_hint_text_color: 1, 1, 1, .6
                 hint_text_color_focus: 1, 1, 1, .6
                 size_hint: .20, .1
-                pos_hint: {'center': (.2, .7)}
+                pos_hint: {'center': (.39, .85)}
                 on_focus: root.set_port_name(self.focus, self.text)
-            MDTextField:
-                id: interface_mode
-                size: 100, 44
-                pos_hint: {'center': (.5, .7)}
-                text: '422'
-                current_hint_text_color: 1, 1, 1, .6
-                hint_text_color_focus: 1, 1, 1, .6
-                size_hint: .15, .1
-                on_focus: if self.focus: root.menu_interface.open()
             MDTextField:
                 id: port_baudrate
                 size: 100, 44
-                pos_hint: {'center': (.8, .7)}
+                pos_hint: {'center': (.37, .75)}
                 text: '9600'
                 current_hint_text_color: 1, 1, 1, .6
                 hint_text_color_focus: 1, 1, 1, .6
                 size_hint: .15, .1
                 on_focus: if self.focus: root.menu_baud.open()
-            Label:
-                text: 'Биты данных'
-                color: 1, 1, 1, .6
-                pos_hint: {'center': (.2, .6)} 
-            Label:
-                text: 'Четность'
-                color: 1, 1, 1, .6
-                pos_hint: {'center': (.5, .6)}
-            Label:
-                text: 'Стоп бит'
-                color: 1, 1, 1, .6
-                pos_hint: {'center': (.8, .6)}
-            MDTextField:
-                id: bytesize
-                size: 100, 44
-                pos_hint: {'center': (.2, .5)}
-                text: '8'
-                current_hint_text_color: 1, 1, 1, .6
-                hint_text_color_focus: 1, 1, 1, .6
-                size_hint: .15, .1
-                on_focus: if self.focus: root.menu_bytesize.open()
-            MDTextField:
-                id: parity
-                size: 100, 44
-                pos_hint: {'center': (.5, .5)}
-                text: 'No'
-                current_hint_text_color: 1, 1, 1, .6
-                hint_text_color_focus: 1, 1, 1, .6
-                size_hint: .15, .1
-                on_focus: if self.focus: root.menu_parity.open()
-            MDTextField:
-                id: stopbits
-                size: 100, 44
-                pos_hint: {'center': (.8, .5)}
-                text: '1'
-                current_hint_text_color: 1, 1, 1, .6
-                hint_text_color_focus: 1, 1, 1, .6
-                size_hint: .15, .1
-                on_focus: if self.focus: root.menu_stopbits.open()
             MDRaisedButton:
                 text: 'Подключить'
                 size_hint: None, None
                 size: 100, 44
                 md_bg_color: 1, .4, .2, 1
-                pos_hint: {'center': (.2, .1)}
+                pos_hint: {'center': (.3, .1)}
                 on_release: root.start_button()
             MDRaisedButton:
                 text: 'Отключить'
                 size_hint: None, None
                 md_bg_color: 1, .4, .2, 1
                 size: 100, 44
-                pos_hint: {'center': (.8, .1)}
+                pos_hint: {'center': (.7, .1)}
                 on_release: root.close_button()
             Label:
                 text: 'Ethernet'
                 bold: True
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.3, .35)}  
+                pos_hint: {'center': (.63, .95)}
             Label:
                 text: 'Порт'
                 color: 1, 1, 1, .6
-                pos_hint: {'center': (.3, .25)}     
+                pos_hint: {'center': (.64, .85)}
             MDTextField:
-                id: port_name
+                id: tcp_port
                 line_color_focus: 1, .4, .2, 1
                 hint_text: ''
-                text: '34458'
+                text: '34444'
+                size: 80, 44
                 current_hint_text_color: 1, 1, 1, .6
                 hint_text_color_focus: 1, 1, 1, .6
                 size_hint: .20, .1
-                pos_hint: {'center': (.5, .25)}
-                on_focus: root.set_port_name(self.focus, self.text)      
+                pos_hint: {'center': (.78, .85)}
+                on_focus: root.set_tcp_port(self.focus, self.text)
+            Label:
+                text: 'Частота'
+                color: 1, 1, 1, .6
+                pos_hint: {'center': (.43, .55)}
+            MDSlider:
+                id: freq
+                pos_hint:{'center': (.53, .55)}
+                min: 1
+                max: 100
+                hint: False
+                value: 1
+                color: 1, .4, .2, 1
+                size_hint: None, None
+                on_active: root.set_frequency(self.active, self.value)
+            Label:
+                text: str(int(freq.value)) + " Гц"
+                pos_hint:{'center': (.63, .55)}
+                color: 1, 1, 1, .6
             Check:
                 active: False
                 id: serial
-                pos_hint: {'center_x': .5, 'center_y': .95}
+                pos_hint: {'center_x': .3, 'center_y': .95}
                 on_active: root.set_type_tr(*args)
             Check:
                 active: True
                 id: tcp
-                pos_hint: {'center_x': .5, 'center_y': .35}
+                pos_hint: {'center_x': .69, 'center_y': .95}
                 on_active: root.set_type_tr(*args)
-
 
 <Check@MDCheckbox>:
     group: 'group'

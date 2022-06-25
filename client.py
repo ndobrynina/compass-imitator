@@ -1,7 +1,7 @@
 import socket
 import sys
 
-HOST, PORT = '192.168.208.77', 34458
+HOST, PORT = '192.168.208.77', 34444
 connected = True
 
 def recvall(sock):
@@ -9,7 +9,7 @@ def recvall(sock):
     data = bytearray()
     while True:
         packet = sock.recv(BUFF_SIZE)
-        if not packet:  # Important!!
+        if not packet:
             break
         data.extend(packet)
     return data

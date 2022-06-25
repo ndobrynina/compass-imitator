@@ -31,10 +31,11 @@ class DesignModel:
         self._baudrate = 9600
         self._type_tr = False
         self._transmitter = None
-        self._tcp_port = '9000'
+        self._tcp_port = '34444'
         self._mvar = ''
         self._mdev = ''
-        self._bytesize = 8
+        self._frequency = 1
+
 
     @property
     def port(self):
@@ -113,8 +114,12 @@ class DesignModel:
         return self._type_tr
 
     @property
-    def bytesize(self):
-        return self._bytesize
+    def tcp_port(self):
+        return self._tcp_port
+
+    @property
+    def frequency(self):
+        return self._frequency
 
     @port.setter
     def port(self, value):
@@ -124,9 +129,13 @@ class DesignModel:
     def baudrate(self, value):
         self._baudrate = value
 
-    @bytesize.setter
-    def bytesize(self, value):
-        self._bytesize = value
+    @tcp_port.setter
+    def tcp_port(self, value):
+        self._tcp_port = value
+
+    @frequency.setter
+    def frequency(self, value):
+        self._frequency = value
 
     @hdt_course.setter
     def hdt_course(self, value):
@@ -270,7 +279,7 @@ class DesignModel:
                                                   self._baudrate)  # создание экземпляра класса SerialTransmitter
             print('switch')
         else:
-            self._transmitter = TCP(self)
+            self._transmitter = TCP(self, int(self._tcp_port)) # передача текущего экземпляра класса DesignModel для динамической настройки сентенций
             print('ready')
         self._started = True  # флаг для запуска потока
         work_thread = threading.Thread(target=self.work)  # создание потока
@@ -279,10 +288,7 @@ class DesignModel:
 
     def work(self):
         if self._type_tr != 1:
-            print('Sending')
             while self._started:
-                s = self.get_data()
-                print(s)
                 self._transmitter.connect()
                 self._transmitter.handle()
         else:
@@ -290,7 +296,7 @@ class DesignModel:
                 try:
                     self._transmitter.transmit(self.get_data())
                 finally:
-                    sleep(1 / 5)
+                    sleep(1 / self._frequency)
 
     def close_button(self):
         self._started = False
@@ -308,35 +314,42 @@ class SerialTransmitter:
         for s in sent:
             self._serial_port.write(s)
 
+def get_current_ip():
+    hostname = socket.gethostname()
+    ip_addr = socket.gethostbyname(hostname)
+    return ip_addr
+
 class MyHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-
         try:
-            print(f'sending to {self.client_address} {self.server.update()}')
-            self.server.update()
             for d in self.server.update():
                 self.request.send(d)
         except BrokenPipeError:
             self.server.shutdown_request(self.request)
         finally:
-            sleep(1 / 1)
+            sleep(1 / self.server.get_freq())
 
 
 class TCP(socketserver.TCPServer):
     allow_reuse_address = True
 
-    def __init__(self, dm):
-        self._host = '192.168.208.77'
-        self._port = 34458
+    def __init__(self, dm, port):
+        self._host = get_current_ip()
+        self._port = port
         self._obj = dm
         self._data = None
         self._tcp_start = False
+        self._frequency = None
         super().__init__((self._host, self._port), MyHandler)  # вызываю метод инициализации из родительского класса
 
     def connect(self):
         self.serve_forever()
         self._tcp_start = True
+
+    def get_freq(self):
+        self._frequency = self._obj.frequency
+        return self._frequency
 
     def update(self):
         self._data = self._obj.get_data()
