@@ -1,4 +1,3 @@
-from abc import abstractmethod
 import threading
 from time import sleep
 from serial import Serial
@@ -231,7 +230,7 @@ class DesignModel:
             s_xor = format(xor, '#04x')  # перевод в 16-ричную систему с определенным форматом
             ths_sent = str.encode(self._ths_sentence + s_xor[2:].upper() + '\r\n')
         if not self._ths_checksum:
-            ths_sent = str.encode(self._ths_sentence + 'XZ\r\n')
+            ths_sent = str.encode(self._ths_sentence + 'HH\r\n')
         return ths_sent
 
     def get_hdg(self):
@@ -243,7 +242,7 @@ class DesignModel:
             s_xor = format(xor, '#04x')
             hdg_sent = str.encode(self._hdg_sentence + s_xor[2:].upper() + '\r\n')
         if not self._hdg_checksum:
-            hdg_sent = str.encode(self._hdg_sentence + 'XZ\r\n')
+            hdg_sent = str.encode(self._hdg_sentence + 'HH\r\n')
         return hdg_sent
 
     def get_hdt(self):
@@ -255,7 +254,7 @@ class DesignModel:
             s_xor = format(xor, '#04x')
             hdt_sent = str.encode(self._hdt_sentence + s_xor[2:].upper() + '\r\n')
         if not self._hdt_checksum:
-            hdt_sent = str.encode(self._hdt_sentence + 'XZ\r\n')
+            hdt_sent = str.encode(self._hdt_sentence + 'HH\r\n')
         return hdt_sent
 
     def get_data(self):
@@ -289,13 +288,14 @@ class DesignModel:
     def work(self):
         if self._type_tr != 1:
             while self._started:
+                s = self.get_data()
+                print(s)
                 self._transmitter.connect()
                 self._transmitter.handle()
         else:
             while self._started:
-                try:
-                    self._transmitter.transmit(self.get_data())
-                finally:
+                for data in self.get_data():
+                    self._transmitter.transmit(data)
                     sleep(1 / self._frequency)
 
     def close_button(self):
@@ -311,31 +311,38 @@ class SerialTransmitter:
         self._serial_port.close()
 
     def transmit(self, sent):
-        for s in sent:
-            self._serial_port.write(s)
+        self._serial_port.write(sent)
 
-def get_current_ip():
+# Windows
+def get_ip():
     hostname = socket.gethostname()
     ip_addr = socket.gethostbyname(hostname)
     return ip_addr
+
+#Linux
+# def get_ip():
+#     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+#     s.connect(('<broadcast>', 0))
+#     return s.getsockname()[0]
 
 class MyHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         try:
+            print(f'{get_ip()} sending to {self.client_address} {self.server.update()} with {self.server.get_freq()}')
             for d in self.server.update():
                 self.request.send(d)
+            sleep(1 / self.server.get_freq())
         except BrokenPipeError:
             self.server.shutdown_request(self.request)
-        finally:
-            sleep(1 / self.server.get_freq())
 
 
 class TCP(socketserver.TCPServer):
     allow_reuse_address = True
 
     def __init__(self, dm, port):
-        self._host = get_current_ip()
+        self._host = get_ip()
         self._port = port
         self._obj = dm
         self._data = None
