@@ -1,9 +1,11 @@
 import socket
 import sys
 
+#поменять айпи при необходимости
 HOST, PORT = '192.168.208.77', 34444
 connected = True
 
+#метод для определения границ сообщения
 def recvall(sock):
     BUFF_SIZE = 4096
     data = bytearray()
